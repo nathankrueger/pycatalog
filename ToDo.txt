@@ -1,0 +1,28 @@
+* Add feature to specify root directory, change file paths to relative to said directory
+* Add feature to annotate missing files in a given directory (recursively search downward?)
+* Add feature to check if all files in DB exist on disk (validate command)
+* Change file format to JSON for greater flexibility
+
+
+File format:
+[
+	# Global section
+	{
+		New folder : str
+		Folder     : str
+		Media Player command : str
+		Single inst Media Player command : str
+	}
+
+	# List of titles
+	{
+		[
+			{
+				Actual Filename : str
+				Obfuscated Filename : str
+				Keywords : str (or list)
+				Actor    : str
+			}
+		]
+	}
+]
