@@ -631,7 +631,7 @@ def main():
 		# List the queried files
 		if args.list:
 			for filename in fileList:
-				print "{0:80} {1:20} {2}".format(filename, getBasename(filename), getObfuscatedName(filename))
+				print filename
 
 	# Save everything
 	conn.commit()
