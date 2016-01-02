@@ -236,8 +236,14 @@ def updateFile(newFolder, textFile):
 	orderedOutputDict = collections.OrderedDict(sorted(outputDict.items()))	
 
 	outfile = open(textFile, 'w')
+	first = True
 	for key in orderedOutputDict.keys():
-		outfile.write('{0} {1} {2}\n'.format(key, orderedOutputDict[key][0], orderedOutputDict[key][1]))
+		if first:
+			first = False
+		else:
+			outfile.write('\n')
+			
+		outfile.write('{0} {1} {2}'.format(key, orderedOutputDict[key][0], orderedOutputDict[key][1]))
 
 	outfile.close()
 
