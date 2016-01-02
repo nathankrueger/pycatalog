@@ -3,3 +3,5 @@ text_defs_12_30_15.bak
 text_defs_2016
 *.m3u
 *.db
+.hide
+.obfuscated
