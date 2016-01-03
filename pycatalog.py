@@ -463,7 +463,7 @@ def audit_text(text_file):
 					bad_lines.append(filename)
 
 	for line in bad_lines:
-		print "Bad line: {0}".format(line)
+		print line
 
 def audit_db(cursor):
 	rows = getAllRows(cursor)
