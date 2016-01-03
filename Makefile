@@ -34,6 +34,9 @@ keys:
 sync_recent:
 	$(PYCAT_CMD) --all --timesort --list --no_play --limit=$(RECENT_FILE_NUM) | xargs -I % cp % $(SYNC_DIR)
 
+update:
+	$(PYCAT_CMD) --update=$(CURRENT_TEXT_DEFS)
+
 load:
 	$(PYCAT_CMD) --input=$(CURRENT_TEXT_DEFS)
 
