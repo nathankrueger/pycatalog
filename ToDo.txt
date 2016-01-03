@@ -1,4 +1,11 @@
 * Add feature to specify root directory, change file paths to relative to said directory
+* Add exception handling around hide / unhide operations to make this part safer
+* Refactor into multiple files
+  - main.py
+  - playlist.py
+  - sql_backend.py
+
+* Refactor titles into a class
 * Change the actor field into list -- one title *should* be able to have more than one actor
 * Change file format to JSON for greater flexibility
 	Proposed "JSON" File format:
