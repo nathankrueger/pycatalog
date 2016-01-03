@@ -315,7 +315,6 @@ def query(cursor, actor=None, keywords=None, all_keywords=False):
 
 	elif actor:
 		q = "SELECT * FROM {0} WHERE actor='{1}'".format(TITLES_TABLENAME, actor)
-		print "Executing {0}...".format(q)
 		cursor.execute(q)
 		for row in cursor.fetchall():
 			fileList.append(row[0])
