@@ -107,7 +107,6 @@ def deserializeObfuscatedDict(filename):
 
 	return result
 
-
 def moveFile(filename, target, dry):
 	print "Moving file {0} to {1}".format(filename, target)
 	if not dry:
@@ -126,7 +125,12 @@ def timeSortFiles(files):
 	timeDict = {} # A dictionary with (key: timestamp, value: file [])
 	result = []
 	for filename in files:
-		timestamp = os.path.getmtime(filename) # Numeric timestamp
+		try:
+			timestamp = os.path.getmtime(filename) # Numeric timestamp
+		except Exception as err:
+			print "Unable to timesort:\n\t{0}".format(err)
+			return files # Return unsorted list as failure condition
+
 		if not timestamp in timeDict.keys():
 			timeDict[timestamp] = [filename]
 		else:
@@ -153,51 +157,68 @@ def limitFiles(files, limit):
 
 	return result
 
+# Return a list of files the operating system is able to see
+def validateFiles(files):
+	result = []
+	for filename in files:
+		if os.path.isfile(filename):
+			result.append(filename)
+
+	return result
+
 def makePlaylist(files, name, ext, hide_file, timesort):
-	f = open(name, 'w')
+	result = True
+	files = validateFiles(files)
+	if len(files) == 0:
+		result = False
 
-	obs = isObfuscated()
-	obsDict = deserializeObfuscatedDict(hide_file)
-	inverseDict = {}
-	fileTupleList = []
-	if obs:
-		# Get obfuscation dictionary
-		inverseDict = getInverseDict(obsDict)
+	if result:
+		f = open(name, 'w')
 
-		# If timesorted, we don't want to sort based on display name
-		if timesort:
-			for filename in files:
-				disp_name = getBasename(inverseDict[filename])
-				fileTupleList.append((filename, disp_name))
+		obs = isObfuscated()
+		obsDict = deserializeObfuscatedDict(hide_file)
+		inverseDict = {}
+		fileTupleList = []
+		if obs:
+			# Get obfuscation dictionary
+			inverseDict = getInverseDict(obsDict)
 
-		# Sort alphabetically based on display name
+			# If timesorted, we don't want to sort based on display name
+			if timesort:
+				for filename in files:
+					disp_name = getBasename(inverseDict[filename])
+					fileTupleList.append((filename, disp_name))
+
+			# Sort alphabetically based on display name
+			else:
+				dispFileDict = {}
+
+				for filename in files:
+					disp_name = getBasename(inverseDict[filename])
+					dispFileDict[disp_name] = filename
+			
+				dispFileDictKeys = dispFileDict.keys()
+				dispFileDictKeys.sort()
+				for dispName in dispFileDictKeys:
+					fileTupleList.append((dispFileDict[dispName], dispName))
+
 		else:
-			dispFileDict = {}
-
 			for filename in files:
-				disp_name = getBasename(inverseDict[filename])
-				dispFileDict[disp_name] = filename
-		
-			dispFileDictKeys = dispFileDict.keys()
-			dispFileDictKeys.sort()
-			for dispName in dispFileDictKeys:
-				fileTupleList.append((dispFileDict[dispName], dispName))
+				fileTupleList.append((filename, getBasename(filename)))
 
-	else:
-		for filename in files:
-			fileTupleList.append((filename, getBasename(filename)))
-
-	if ext:
-		f.write("#EXTM3U\n\n")
-
-	for fileTuple in fileTupleList:
-		filename = fileTuple[0]
-		disp_name = fileTuple[1]
 		if ext:
-			f.write("#EXTINF:-1,{0}\n".format(disp_name))
-		f.write('{0}\n\n'.format(filename))
+			f.write("#EXTM3U\n\n")
 
-	f.close()
+		for fileTuple in fileTupleList:
+			filename = fileTuple[0]
+			disp_name = fileTuple[1]
+			if ext:
+				f.write("#EXTINF:-1,{0}\n".format(disp_name))
+			f.write('{0}\n\n'.format(filename))
+
+		f.close()
+
+	return result
 
 def playPlaylist(filename, single):
 	command = '{0} {1}'.format(SINGLE_VLC_COMMAND if single else VLC_COMMAND, filename)
@@ -623,9 +644,9 @@ def main():
 			fileList = limitFiles(fileList, args.limit)
 
 		# Make and play playlist
-		makePlaylist(fileList, playlist_name, ext, hide_file, timesort)
-		if not args.no_play:
-			playPlaylist(playlist_name, args.single_inst)
+		if makePlaylist(fileList, playlist_name, ext, hide_file, timesort):
+			if not args.no_play:
+				playPlaylist(playlist_name, args.single_inst)
 		
 		# List the queried files
 		if args.list:
