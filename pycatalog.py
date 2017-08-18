@@ -482,8 +482,13 @@ def audit_text(text_file):
 				if not match:
 					bad_lines.append(filename)
 
+	result = []
 	for line in bad_lines:
 		print line
+		line_items = line.split(' ')
+		result.append(line_items[0])
+
+	return result
 
 def audit_db(cursor):
 	rows = getAllRows(cursor)
@@ -629,7 +634,7 @@ def main():
 	
 	# Print out poorly formed file entries
 	if args.audit_text:
-		audit_text(args.audit_text)
+		fileList = audit_text(args.audit_text)
 
 	if args.audit_db:
 		audit_db(cursor)
