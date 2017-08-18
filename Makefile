@@ -1,9 +1,16 @@
 PYCAT_CMD=./pycatalog.py
-CURRENT_TEXT_DEFS=text_defs_2016
+CURRENT_TEXT_DEFS=text_defs_2017
 OBFUSCATED_MARKER_FILE=.obfuscated
 GIT_REPO=https://github.com/nathankrueger/pycatalog
 RECENT_FILE_NUM=100
 SYNC_DIR=./
+TEXT_EDITOR_CMD=open -a TextWrangler
+
+ec:
+	gpg -c $(FILE)
+
+dc:
+	gpg $(FILE)
 
 # Git stuff
 co:
@@ -39,6 +46,10 @@ update:
 
 load:
 	$(PYCAT_CMD) --input=$(CURRENT_TEXT_DEFS)
+
+audit:
+	$(PYCAT_CMD) --audit_text=$(CURRENT_TEXT_DEFS)
+	$(TEXT_EDITOR_CMD) $(CURRENT_TEXT_DEFS)
 
 reload: clean load
 
