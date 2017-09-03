@@ -415,6 +415,24 @@ def dump_keywords(cursor):
 		if len(key.strip('\s')) > 0:
 			print '{0:20} {1}'.format(key, len(keyDict[key]))
 
+def getPopularActors(cursor, min_count):
+	rows = getAllRows(cursor)
+	histogram = {}
+	result = []
+	for row in rows:
+		actor = row[1]
+		if not actor in histogram:
+			histogram[actor] = 1
+		else:
+			histogram[actor] = histogram[actor] + 1
+	
+	for actor in histogram.keys():
+		if histogram[actor] >= min_count:
+			result.append(actor)
+	
+	result.sort()
+	return result
+
 def hideFiles(cursor, hideFile, dry):
 	allFiles = getAllFiles(cursor)
 	obsDict = getObfuscatedDict(allFiles)
@@ -537,6 +555,7 @@ def main():
 	parser.add_argument('--basic_m3u', action='store_true', help='Use minimal playlist format.')
 	parser.add_argument('--dry_run', action='store_true', help='Update the database without moving files for hide operations.')
 	parser.add_argument('--count', action='store_true', help='Count the number of file entries in the database.')
+	parser.add_argument('--popular', type=int, help='Display all actors with more than n titles.')
 	args = parser.parse_args()
 
 	# Default variables that can be overridden
@@ -638,6 +657,11 @@ def main():
 
 	if args.audit_db:
 		audit_db(cursor)
+
+	if args.popular:
+		actors = getPopularActors(cursor, args.popular) 
+		for actor in actors:
+			print actor
 
 	if len(fileList) > 0:
 		# Sort files by timestamp if requested
